@@ -52,8 +52,10 @@ int main() {
 
 	// // Remove elements - 2nd query
   // to erasse x 
-	A.erase(A.order_of_key(x);
-
+	 auto it = s.find_by_order(s.order_of_key(X));
+        if (it != s.end()) {
+            s.erase(it);
+        }
 
 	// A contains
 	cout << "A = ";
