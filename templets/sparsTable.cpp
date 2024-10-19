@@ -7,7 +7,7 @@ void build (const vector<int>& a){
 	sp = vector<vector<int>>(log2(sz) + 5, vector<int>(sz));
     sp[0] = a;
     for (int i = 1; i < sp.size(); i++){
-    	for (int j = 0; j + (1 << i) - 1 < n; j++){
+    	for (int j = 0; j + (1 << i) - 1 < sz; j++){
     		sp[i][j] = merge(sp[i - 1][j] , sp[i - 1][j + (1 << (i - 1))]);
     	}
     }
