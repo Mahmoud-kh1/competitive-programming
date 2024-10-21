@@ -4,7 +4,7 @@ int merge (int g, int b){
 vector<vector<int>>sp;
 void build (const vector<int>& a){
 	int sz = a.size();
-	sp = vector<vector<int>>(log2(sz) + 5, vector<int>(sz));
+	sp = vector<vector<int>>(__lg(sz) + 5, vector<int>(sz));
     sp[0] = a;
     for (int i = 1; i < sp.size(); i++){
     	for (int j = 0; j + (1 << i) - 1 < sz; j++){
