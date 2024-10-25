@@ -1,50 +1,74 @@
-struct Manacher {
-    vector<int> p;
-    string T;
+#include <vector>
+#include <string>
+#include <algorithm>
 
-    void build(string &s) {
-        string t;
-        T = s;
-        for (auto &val : s) t += '#', t += val;
-        t += '#';
-        int n = t.size();
-        p.resize(n, 0);
-        int l = 0, r = 0;
-        for (int i = 0; i < n; i++) {
-            p[i] = (i < r) ? min(r - i, p[l + r - i]) : 1;
-            while (i - p[i] >= 0 && i + p[i] < n && t[i + p[i]] == t[i - p[i]]) p[i]++;
-            if (i + p[i] > r) {
-                r = i + p[i];
-                l = i - p[i];
+class Manacher {
+public:
+    std::vector<int> palindromeLengths;
+    std::string transformedString;
+
+    void preprocess(const std::string &input) {
+        transformedString = "#";
+        for (char ch : input) {
+            transformedString += ch;
+            transformedString += '#';
+        }
+        
+        int n = transformedString.size();
+        palindromeLengths.resize(n, 0);
+        
+        int center = 0, rightBoundary = 0;
+        for (int i = 0; i < n; ++i) {
+            // Use the mirror property to initialize the palindrome length
+            if (i < rightBoundary) {
+                palindromeLengths[i] = std::min(rightBoundary - i, palindromeLengths[center * 2 - i]);
+            } else {
+                palindromeLengths[i] = 1; // At least the character itself
+            }
+
+            // Expand around the center
+            while (i - palindromeLengths[i] >= 0 && 
+                   i + palindromeLengths[i] < n && 
+                   transformedString[i + palindromeLengths[i]] == transformedString[i - palindromeLengths[i]]) {
+                palindromeLengths[i]++;
+            }
+
+            // Update center and right boundary if we've extended past the current known right boundary
+            if (i + palindromeLengths[i] > rightBoundary) {
+                center = i;
+                rightBoundary = i + palindromeLengths[i];
             }
         }
     }
 
-    int GetLongest(int center, bool odd = true) {
-        int newCenter = 2 * center + !odd + 1;
-        return p[newCenter] - 1;
+    int getLongestPalindromeLength(int index, bool isOddLength = true) const {
+        int adjustedIndex = 2 * index + (isOddLength ? 1 : 0);
+        return palindromeLengths[adjustedIndex] - 1; // Exclude the added '#' characters
     }
 
-    bool IsPalindrome(int l, int r) {
-        return (r - l + 1) <= GetLongest((l + r) / 2, l % 2 == r % 2);
+    bool isPalindromeInRange(int left, int right) const {
+        int palindromeCenter = (left + right) / 2;
+        return (right - left + 1) <= getLongestPalindromeLength(palindromeCenter, (left % 2 == right % 2));
     }
 
-    string LongestPalindromeSubStr() {
-        int maxLength = 0, start = -1;
-        for (int i = 0; i < T.size(); i++) {
-            if (GetLongest(i, false) > maxLength) {
-                maxLength = GetLongest(i, false);
-                start = i;
-            }
-            if (GetLongest(i, true) > maxLength) {
-                maxLength = GetLongest(i, true);
-                start = i;
+    std::string longestPalindromeSubstring() {
+        int maxLength = 0, startIndex = 0;
+
+        for (int i = 0; i < transformedString.size(); ++i) {
+            for (bool isOdd : {true, false}) {
+                int length = getLongestPalindromeLength(i, isOdd);
+                if (length > maxLength) {
+                    maxLength = length;
+                    startIndex = i;
+                }
             }
         }
 
-        if (maxLength % 2 == 1) {
-            return T.substr(start - maxLength / 2, maxLength);
+        int substringStart = startIndex - maxLength / 2;
+        if (maxLength % 2 == 0) {
+            substringStart += 1; // Adjust for even length
         }
-        return T.substr(start - maxLength / 2 + 1, maxLength);
+
+        return transformedString.substr(substringStart, maxLength);
     }
 };
