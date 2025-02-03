@@ -7,6 +7,7 @@ arrRange((data type), name , mnvalue , mxvalue))
 
 ex 
 arrRange(int, freq, -n , n) 
+dont forget to use long long if you need it 
 
 when we memset we use 
 memset(name_ , -1 or 0 , sizeof name_) we should in memset put _ after name 
