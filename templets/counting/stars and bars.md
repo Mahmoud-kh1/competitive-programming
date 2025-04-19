@@ -90,11 +90,12 @@ So, there are **6825** such ordered tuples.
 We are asked to find the number of ways we can roll a **standard 6-sided die twice** such that the sum of the two rolls equals **10**. We will solve this using the **Stars and Bars** method along with **Inclusion-Exclusion**.
 
 ### To solve this, let the two dice rolls be denoted as `x_1` and `x_2`, where: 
-`x_1 + x_2 = 10`
+
+       x_1 + x_2 = 10
    
 and
 
-`1 <= x_1, x_2 <= 6  `
+         1 <= x_1, x_2 <= 6  
 
 
 This implies we are looking for the number of integer solutions to the equation above, with the constraints that both `x_1` and `x_2` are between 1 and 6.
@@ -105,7 +106,7 @@ This implies we are looking for the number of integer solutions to the equation 
 
 First, let's consider the number of solutions to the equation `x_1 + x_2 = 10`, where both `x_1` and `x_2` are greater than or equal to 1. To handle this, we can transform the variables as follows:
 
-`y_1 = x_1 - 1 and y_2 = x_2 - 1` 
+      y_1 = x_1 - 1 and y_2 = x_2 - 1
 
 
 Now, `y_1, y_2 >= 0`, and the equation becomes:
