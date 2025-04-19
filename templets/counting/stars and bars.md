@@ -178,15 +178,15 @@ We are asked to find the number of ways we can roll a **standard 6-sided die twi
 
 To solve this, let the two dice rolls be denoted as `x_1` and `x_2`, where:
 
-$$
-x_1 + x_2 = 10
-$$
+       $$
+           x_1 + x_2 = 10
+       $$
 
 and
 
-$$
-1 \leq x_1, x_2 \leq 6
-$$
+          $$
+            1 \leq x_1, x_2 \leq 6
+          $$
 
 This implies we are looking for the number of integer solutions to the equation above, with the constraints that both `x_1` and `x_2` are between 1 and 6.
 
@@ -196,15 +196,15 @@ This implies we are looking for the number of integer solutions to the equation 
 
 First, let's consider the number of solutions to the equation $x_1 + x_2 = 10$, where both $x_1$ and $x_2$ are greater than or equal to 1. To handle this, we can transform the variables as follows:
 
-$$
-y_1 = x_1 - 1  \quad \text{and} \quad y_2 = x_2 - 1
-$$
+            $$
+               y_1 = x_1 - 1  \quad \text{and} \quad y_2 = x_2 - 1
+            $$
 
 Now, $y_1, y_2 \geq 0$, and the equation becomes:
 
-$$
-y_1 + y_2 = 8
-$$
+        $$
+           y_1 + y_2 = 8
+        $$
 
 The number of solutions to this equation is $8 + 1 = 9$, which corresponds to the following valid pairs:
 
@@ -248,9 +248,9 @@ Next, we need to subtract the cases where either $x_1 > 6$ or $x_2 > 6$ because 
 
 Now, we subtract the 6 invalid cases from the total number of solutions:
 
-$$
-9 - 6 = 3
-$$
+       $$
+        9 - 6 = 3
+       $$
 
 Thus, the number of valid solutions is 3.
 
