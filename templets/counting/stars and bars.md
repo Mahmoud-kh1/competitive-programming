@@ -89,104 +89,17 @@ So, there are **6825** such ordered tuples.
 
 We are asked to find the number of ways we can roll a **standard 6-sided die twice** such that the sum of the two rolls equals **10**. We will solve this using the **Stars and Bars** method along with **Inclusion-Exclusion**.
 
-### To solve this, let the two dice rolls be denoted as `x_1` and `x_2`, where: 
-
-      $$ 
-      x_1 + x_2 = 10
-      $$
-   
-and
-
-         $1 <= x_1, x_2 <= 6$
-
-
-This implies we are looking for the number of integer solutions to the equation above, with the constraints that both `x_1` and `x_2` are between 1 and 6.
-
----
-
-### Step 1: Total Number of Solutions (Without Constraints)
-
-First, let's consider the number of solutions to the equation `x_1 + x_2 = 10`, where both `x_1` and `x_2` are greater than or equal to 1. To handle this, we can transform the variables as follows:
-
-      y_1 = x_1 - 1 and y_2 = x_2 - 1
-
-
-Now, `y_1, y_2 >= 0`, and the equation becomes:
-
-
-The number of solutions to this equation is `8 + 1 = 9`, which corresponds to the following valid pairs:
-
-- (1, 9)
-- (2, 8)
-- (3, 7)
-- (4, 6)
-- (5, 5)
-- (6, 4)
-- (7, 3)
-- (8, 2)
-- (9, 1)
-
----
-
-### Step 2: Applying Inclusion-Exclusion
-
-Next, we need to subtract the cases where either `x_1 > 6` or `x_2 > 6` because both dice rolls must fall between 1 and 6.
-
-- **Case 1: When `x_1 > 6`**  
-  If `x_1 > 6`, then `x_1 >= 7`, and thus `x_2 = 10 - x_1` must be less than or equal to 3. The valid pairs are:
-
-  - (7, 3)
-  - (8, 2)
-  - (9, 1)
-
-  This gives 3 solutions.
-
-- **Case 2: When `x_2 > 6`**  
-  Similarly, if `x_2 > 6`, the valid pairs are:
-
-  - (3, 7)
-  - (2, 8)
-  - (1, 9)
-
-  This also gives 3 solutions.
-
----
-
-### Step 3: Final Count
-
-Now, we subtract the 6 invalid cases from the total number of solutions:
-
-9 - 6 = 3
-Thus, the number of valid solutions is 3.
-
-The valid pairs (where the sum is 10) are:
-
-- (4, 6)
-- (5, 5)
-- (6, 4)
-
----
-
-### Conclusion
-
-There are **3 ways** to roll a sum of 10 with two dice rolls
-
-
-# Problem: Number of Ways to Get a Sum of 10 with Two Dice Rolls
-
-We are asked to find the number of ways we can roll a **standard 6-sided die twice** such that the sum of the two rolls equals **10**. We will solve this using the **Stars and Bars** method along with **Inclusion-Exclusion**.
-
 To solve this, let the two dice rolls be denoted as `x_1` and `x_2`, where:
 
-       $$
-           x_1 + x_2 = 10
-       $$
+$$
+x_1 + x_2 = 10
+$$
 
 and
 
-          $$
-            1 \leq x_1, x_2 \leq 6
-          $$
+$$
+1 \leq x_1, x_2 \leq 6
+$$
 
 This implies we are looking for the number of integer solutions to the equation above, with the constraints that both `x_1` and `x_2` are between 1 and 6.
 
@@ -196,15 +109,15 @@ This implies we are looking for the number of integer solutions to the equation 
 
 First, let's consider the number of solutions to the equation $x_1 + x_2 = 10$, where both $x_1$ and $x_2$ are greater than or equal to 1. To handle this, we can transform the variables as follows:
 
-            $$
-               y_1 = x_1 - 1  \quad \text{and} \quad y_2 = x_2 - 1
-            $$
+$$
+y_1 = x_1 - 1  \quad \text{and} \quad y_2 = x_2 - 1
+$$
 
 Now, $y_1, y_2 \geq 0$, and the equation becomes:
 
-        $$
-           y_1 + y_2 = 8
-        $$
+$$
+y_1 + y_2 = 8
+$$
 
 The number of solutions to this equation is $8 + 1 = 9$, which corresponds to the following valid pairs:
 
@@ -248,9 +161,9 @@ Next, we need to subtract the cases where either $x_1 > 6$ or $x_2 > 6$ because 
 
 Now, we subtract the 6 invalid cases from the total number of solutions:
 
-       $$
-        9 - 6 = 3
-       $$
+$$
+9 - 6 = 3
+$$
 
 Thus, the number of valid solutions is 3.
 
@@ -271,6 +184,7 @@ There are **3 ways** to roll a sum of 10 with two dice rolls.
 ### Code Implementation (Optional)
 
 You can implement this logic in Python or any programming language of your choice to verify the results.
+
 
 
 
