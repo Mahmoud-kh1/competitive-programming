@@ -315,6 +315,91 @@ $$
 $$
 
 
+# Problem: Count Solutions to \(x + y + z = 48\) where \(x < y < z\)
+
+We are tasked with finding the number of solutions to the equation:
+
+$$
+x + y + z = 48
+$$
+
+where \(x, y, z\) are positive integers and the restriction is that \(x < y < z\), meaning the values of \(x\), \(y\), and \(z\) are distinct.
+
+---
+
+### Step 1: General Count Using Stars and Bars
+
+Without any constraints, we would count the number of solutions to this equation where \(x, y, z \geq 0\) using the stars and bars method. The number of ways to do this is given by:
+
+$$
+\binom{48 + 3 - 1}{3 - 1} = \binom{50}{2}
+$$
+
+However, this includes solutions where \(x = y\), \(y = z\), or \(x = z\), which we do not want. So, we need to exclude those cases.
+
+---
+
+### Step 2: Excluding Invalid Cases
+
+#### Case 1: \(x = y\)
+
+If \(x = y\), then we rewrite the equation as:
+
+$$
+2x + z = 48
+$$
+
+Solving for \(z\):
+
+$$
+z = 48 - 2x
+$$
+
+For this equation to have solutions, \(x\) must be an integer such that \(z\) is positive, i.e., \(48 - 2x > 0\), which gives \(x < 24\). The number of possible values for \(x\) is from 1 to 23, so there are 23 solutions. Now, we need to consider the fact that there are 3 ways to select which two of the three variables \(x, y, z\) are equal, namely \(\binom{3}{2} = 3\). Therefore, the number of cases where \(x = y\) (or similarly for other pairs of equal digits) is:
+
+$$
+\binom{3}{2} \times 23 = 3 \times 23 = 69
+$$
+
+#### Case 2: All Variables Equal
+
+The case where \(x = y = z\) leads to the equation:
+
+$$
+3x = 48
+$$
+
+which has no integer solution because 48 is not divisible by 3. Thus, this case contributes 0 solutions.
+
+---
+
+### Step 3: Final Count Using Inclusion-Exclusion
+
+We now apply inclusion-exclusion to subtract the cases where any two variables are equal. The final formula for the number of solutions is:
+
+$$
+\binom{50}{2} - 3 \times 23 - 1
+$$
+
+Breaking it down:
+
+1. \(\binom{50}{2}\) counts all solutions without restrictions.
+2. \(3 \times 23\) accounts for the cases where two variables are equal.
+3. Subtract 1 for the case where all variables are equal (which doesn't contribute any valid solutions).
+
+---
+
+### Final Answer:
+
+Thus, the final number of solutions to the equation \(x + y + z = 48\) where \(x < y < z\) is:
+
+$$
+\binom{50}{2} - 3 \times 23 - 1
+$$
+
+You can plug in the values for the binomial coefficient and do the calculation to get the final answer.
+ 
+
 
 
 
