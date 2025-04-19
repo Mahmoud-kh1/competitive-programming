@@ -91,11 +91,11 @@ We are asked to find the number of ways we can roll a **standard 6-sided die twi
 
 ### To solve this, let the two dice rolls be denoted as `x_1` and `x_2`, where: 
 
-       x_1 + x_2 = 10
+      $$ x_1 + x_2 = 10$$
    
 and
 
-         1 <= x_1, x_2 <= 6  
+         $1 <= x_1, x_2 <= 6$
 
 
 This implies we are looking for the number of integer solutions to the equation above, with the constraints that both `x_1` and `x_2` are between 1 and 6.
