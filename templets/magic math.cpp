@@ -1,6 +1,101 @@
 #include "bits/stdc++.h"
 using namespace std;
 
+/* // List of distinct primes dividing the current number
+// Size: ω(n)
+vector<ul> primes;
+
+// List of all divisors of the current number
+// Size: d(n), number of divisors (≤1344 for n≤1e9)
+vector<ul> divisors;
+
+// Perform (a * b) % mod safely for 64-bit integers
+// Time: O(1)
+ul modMul(ul a, ul b, const ul mod) {
+    ll ret = a * b - mod * (ul)((db)a * b / mod);
+    // ensure ret in [0, mod)
+    return ret + ((ret < 0) - (ret >= (ll)mod)) * mod;
+}
+
+// Compute a^b % mod via binary exponentiation
+// Time: O(log b) multiplications = O(log n)
+ul modPow(ul a, ul b, const ul mod) {
+    if (b == 0) return 1;
+    ul res = modPow(a, b / 2, mod);
+    res = modMul(res, res, mod);
+    return (b & 1) ? modMul(res, a, mod) : res;
+}
+
+// Deterministic Miller-Rabin primality test for 64-bit n
+// Time: O(k * log n) with k=7 bases ≈ O(log n)
+bool rabin_miller(ul n) {
+    if (n < 2 || n % 6 % 4 != 1) return n - 2 < 2;
+    ul A[] = {2, 325, 9375, 28178, 450775, 9780504, 1795265022},
+        s = __builtin_ctzll(n - 1), d = n >> s;
+    for (ul a : A) {
+        ul p = modPow(a, d, n), i = s;
+        while (p != 1 && p != n - 1 && a % n && i--) {
+            p = modMul(p, p, n);
+        }
+        if (p != n - 1 && i != s) return false;
+    }
+    return true;
+}
+
+// Pollard's Rho algorithm: find a nontrivial factor of composite n
+// Expected time: O(n^(1/4)) iterations, each O(1) modular ops
+ul pollard(ul n) {
+    auto f = [n, this](ul x) { return modMul(x, x, n) + 1; };
+    ul x = 0, y = 0, t = 30, prd = 2, i = 1, q;
+    // Loop until gcd(prd, n) > 1
+    while (t++ % 40 || __gcd(prd, n) == 1) {
+        if (x == y) x = ++i, y = f(x);
+        q = modMul(prd, max(x, y) - min(x, y), n);
+        if (q) prd = q;
+        x = f(x);
+        y = f(f(y));
+    }
+    return __gcd(prd, n);
+}
+
+// Recursively factor n, populating cnt_primes
+// Time: O(n^(1/4) + ω(n) * log n)
+void factor_rec(ul n, map<ul, int> &cnt) {
+    if (n == 1) return;
+    if (rabin_miller(n)) {
+        ++cnt[n];
+        return;
+    }
+    ul u = pollard(n);
+    factor_rec(u, cnt);
+    factor_rec(n / u, cnt);
+}
+
+// Recursively generate divisors from prime factors stored in cnt_primes
+// Time: O(d(n)) calls, where d(n)=#divisors
+void calcDivisorsRec(ul cur, int i) {
+    if (i >= (int)primes.size()) {
+        divisors.push_back(cur);
+        return;
+    }
+    ul p = primes[i];
+    int r = cnt_primes[p];
+    for (int e = 0; e <= r; ++e) {
+        calcDivisorsRec(cur, i + 1);
+        cur *= p;
+    }
+}
+
+// Factor x and compute all its divisors
+// Total time: O(x^(1/4) + d(x))
+void calcDivisors(ul x) {
+    cnt_primes.clear();
+    primes.clear();
+    divisors.clear();
+    factor_rec(x, cnt_primes);
+    for (auto &[p, _] : cnt_primes) primes.push_back(p);
+    calcDivisorsRec(1, 0);
+} */
 void fast() {
     ios::sync_with_stdio(0);
     cin.tie(NULL);
