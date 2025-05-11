@@ -8,7 +8,7 @@
 
 	make it pairs like num , any cnt (like idx) there is problem with eras in orderd ds 
 
-
+*/
 #include<bits/stdc++.h>
 
 #include<ext/pb_ds/assoc_container.hpp>
