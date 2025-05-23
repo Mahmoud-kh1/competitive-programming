@@ -7,3 +7,6 @@ if counter clockwise
 
 newx = x * cos(theta) - y *  sin(theta);
 newy = x * sin(th) + y cos(th);
+
+
+all foumla for get and angles like cos(a + b) and sin(a + b) ... cos(a -b) and all things may be useful
