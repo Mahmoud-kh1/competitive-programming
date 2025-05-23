@@ -1,0 +1,9 @@
+if we have point (x,y) and we want to rotate it clock wise and counter clockwise 
+
+newx = x * cos(theta) + y *  sin(theta);
+newy = -x * sin(th) + y cos(th);
+
+if counter clockwise 
+
+newx = x * cos(theta) - y *  sin(theta);
+newy = x * sin(th) + y cos(th);
