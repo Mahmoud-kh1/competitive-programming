@@ -10,6 +10,8 @@ typedef long long ll;
 #else
 #define debug(x)
 #endif
+
+// query time is log(n) * log(m) , build is o(4nm) 
 struct Node{
     int v;
     Node(){ v = 0;} // Deafult constructor Node
