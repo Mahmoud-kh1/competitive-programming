@@ -1,1 +1,2 @@
+![Flow Screenshot](Screenshot%202025-06-10%20205724.png) 
 - maximum edge disjoint - path : which mean we should get the maximum number of paths from S to T such that there is no edge taken twice 
