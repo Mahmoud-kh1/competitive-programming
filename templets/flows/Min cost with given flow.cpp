@@ -1,4 +1,8 @@
-const int INF = 1e9;
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#define int long long
+const int INF = 2e18;
 
 struct Edge {
     int to, capacity, cost, flow, rev;
@@ -13,14 +17,12 @@ private:
 
 public:
     MinCostMaxFlow(int n) : n(n),
-        adj(n + 1), dist(n + 1), parent(n + 1),
-        parentEdge(n + 1), inQueue(n + 1) {}
+                            adj(n + 1), dist(n + 1), parent(n + 1),
+                            parentEdge(n + 1), inQueue(n + 1) {}
 
     void addEdge(int u, int v, int capacity, int cost) {
-        Edge a = {v, capacity, cost, 0, (int)adj[v].size()};
-        Edge b = {u, 0, -cost, 0, (int)adj[u].size()};
-        adj[u].push_back(a);
-        adj[v].push_back(b);
+        adj[u].push_back({v, capacity, cost, 0, (int)adj[v].size()});
+        adj[v].push_back({u, 0, -cost, 0, (int)adj[u].size() - 1});
     }
 
     bool spfa(int source, int sink) {
@@ -52,18 +54,22 @@ public:
         }
         return dist[sink] < INF;
     }
-      Min cost to get flow with value maxflow 
+        // get min cost with given flow 
     pair<int, int> solve(int source, int sink, int maxFlow) {
         int flow = 0, cost = 0;
 
         while (flow < maxFlow && spfa(source, sink)) {
             int pathFlow = INF;
 
+            // find bottleneck capacity on path
             for (int u = sink; u != source; u = parent[u]) {
                 Edge &e = adj[parent[u]][parentEdge[u]];
                 pathFlow = min(pathFlow, e.capacity - e.flow);
             }
+            // clamp to remaining needed flow
+            pathFlow = min(pathFlow, maxFlow - flow);
 
+            // augment flow & accumulate cost
             for (int u = sink; u != source; u = parent[u]) {
                 Edge &e = adj[parent[u]][parentEdge[u]];
                 e.flow += pathFlow;
@@ -77,7 +83,7 @@ public:
         if (flow < maxFlow) return {-1, -1};
         return {flow, cost};
     }
-    paths that match from source to sink with flow k and min cost 
+
     vector<vector<int>> getRoutes(int source, int sink, int k) {
         vector<vector<int>> routes;
         for (int i = 0; i < k; ++i) {
@@ -94,7 +100,6 @@ public:
                     }
                 }
             }
-
             path.push_back(sink);
             routes.push_back(path);
         }
@@ -102,3 +107,24 @@ public:
         return routes;
     }
 };
+
+signed main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int t = 1;
+    // cin >> t;
+    while (t--) {
+        int n, m, k;
+        cin >> n >> m >> k;
+        MinCostMaxFlow M(n);
+        for (int i = 0; i < m; i++) {
+            int u, v, cap, cost;
+            cin >> u >> v >> cap >> cost;
+            M.addEdge(u, v, cap, cost);
+        }
+        auto res = M.solve(1, n, k);
+        cout << res.second << "\n";
+    }
+    return 0;
+}
