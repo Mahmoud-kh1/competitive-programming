@@ -54,7 +54,7 @@ public:
         }
         return dist[sink] < INF;
     }
-        // get min cost with given flow 
+        // get min cost with given flow O(flow * E * V) 
     pair<int, int> solve(int source, int sink, int maxFlow) {
         int flow = 0, cost = 0;
 
