@@ -3,7 +3,10 @@ using namespace std;
 #define  int long long
 static const int oo = 2e18;
 
-Time is o(V^2 * E) 
+Time is o(V^2 * E)  in max flow 
+Time is (E sqrt(V)) in matching 
+
+
 struct Edge {
     int u, v, flow = 0, cap = 0; // keep the order
 
