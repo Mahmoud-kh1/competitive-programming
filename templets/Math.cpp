@@ -23,3 +23,5 @@ long long safe_mul(long long a, long long b, long long mod) {
     }
     return result;
 } safe mul to compute (a * b) % mod without overflow 
+
+rotation array 90 180 270
