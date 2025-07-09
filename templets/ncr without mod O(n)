@@ -1,0 +1,9 @@
+unsigned long long nCr_exact(int n, int r) {
+    if (n < r)return 0;
+    r = min(r, n - r);
+    __int128 result = 1;
+    for (int i = 1; i <= r; ++i) {
+        result = result * (n - r + i) / i;
+    }
+    return (unsigned long long) result;
+}
