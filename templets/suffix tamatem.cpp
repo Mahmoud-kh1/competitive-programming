@@ -4,11 +4,11 @@ using namespace std;
 
 // Suffix Automaton Template with Full Spectrum of Applications
 // Based on CP-Algorithms: https://cp-algorithms.com/string/suffix-automaton.html
-// Alphabet size assumed lowercase a-z.
 
 struct SuffixAutomaton {
     struct State {
         int len, link;
+        /// use array<int,26> for time optimization if you don't need the methods depends on it
         map<char,int> next;       // transitions
         long long occ;            // number of endpos occurrences
         int first_pos;            // index of first appearance
@@ -19,16 +19,12 @@ struct SuffixAutomaton {
     vector<State> st;
     int last;
 
-    // Constructor
-    // Time: O(1)
-    // Usage: SuffixAutomaton sa(maxlen);
     SuffixAutomaton(int maxlen = 0) {
         st.reserve(2 * maxlen);
         st.push_back(State());
         last = 0;
     }
-
-    // extend: add character c at position pos
+// extend: add character c at position pos
     // Time: amortized O(log|Σ|) with map, O(1) with array
     // Usage: for each char in string: sa.extend(c, index);
     void extend(char c, int pos) {
@@ -63,7 +59,6 @@ struct SuffixAutomaton {
         }
         last = cur;
     }
-
     // prepare: propagate occurrences and build inverse links
     // Time: O(n)
     // Usage: call after all extend() calls
@@ -87,15 +82,11 @@ struct SuffixAutomaton {
         }
     }
 
-    // count_transitions: count total edges in automaton
-    // Time: O(n * |Σ|)
-    // Usage: long long edges = sa.count_transitions();
     long long count_transitions() const {
         long long tot = 0;
         for (auto &s : st) tot += s.next.size();
         return tot;
     }
-
     // is_substring: check if t is a substring of the original string
     // Time: O(|t| * log|Σ|)
     // Usage: bool ok = sa.is_substring(pattern);
@@ -107,8 +98,7 @@ struct SuffixAutomaton {
         }
         return true;
     }
-
-    // count_distinct_substrings: number of distinct substrings
+// count_distinct_substrings: number of distinct substrings
     // Time: O(n)
     // Usage: long long d = sa.count_distinct_substrings();
     long long count_distinct_substrings() const {
@@ -117,7 +107,6 @@ struct SuffixAutomaton {
             res += st[v].len - st[st[v].link].len;
         return res;
     }
-
     // total_length_of_distinct_substrings: sum of lengths of all distinct substrings
     // Time: O(n)
     // Usage: long long L = sa.total_length_of_distinct_substrings();
@@ -130,8 +119,7 @@ struct SuffixAutomaton {
         }
         return ans;
     }
-
-    // kth_substring: returns k-th lexicographically smallest substring
+// kth_substring: returns k-th lexicographically smallest substring
     // Time: O(k * log|Σ|)
     // Usage: string s = sa.kth_substring(k);
     string kth_substring(long long k) const {
@@ -153,8 +141,7 @@ struct SuffixAutomaton {
         }
         return res;
     }
-
-    // first_occurrence: index of first occurrence of t (or -1)
+// first_occurrence: index of first occurrence of t (or -1)
     // Time: O(|t| * log|Σ|)
     // Usage: int pos = sa.first_occurrence(t);
     int first_occurrence(const string &t) const {
@@ -165,8 +152,7 @@ struct SuffixAutomaton {
         }
         return st[v].first_pos - (int)t.size() + 1;
     }
-
-    // all_occurrences: list of starting indices of all occurrences of t
+// all_occurrences: list of starting indices of all occurrences of t
     // Time: O(|t| * log|Σ| + occ_count)
     // Usage: auto occs = sa.all_occurrences(t);
     vector<int> all_occurrences(const string &t) const {
@@ -187,8 +173,7 @@ struct SuffixAutomaton {
         res.erase(unique(res.begin(), res.end()), res.end());
         return res;
     }
-
-    // shortest_non_appearing: finds shortest string not in the original
+// shortest_non_appearing: finds shortest string not in the original
     // Time: O(n * |Σ|)
     // Usage: string s = sa.shortest_non_appearing();
     string shortest_non_appearing() const {
@@ -215,14 +200,17 @@ struct SuffixAutomaton {
         vector<int> res(t.size());
         for (int i = 0; i < (int)t.size(); ++i) {
             char c = t[i];
+            // if we can extend from v by c, do it
             if (st[v].next.count(c)) {
                 v = st[v].next.at(c);
                 ++l;
             } else {
+                // otherwise, follow suffix-links until we can, or back to root
                 while (v != -1 && !st[v].next.count(c))
                     v = st[v].link;
                 if (v == -1) {
-                    v = 0; l = 0;
+                    v = 0;
+                    l = 0;
                 } else {
                     l = st[v].len + 1;
                     v = st[v].next.at(c);
@@ -232,23 +220,27 @@ struct SuffixAutomaton {
         }
         return res;
     }
-
     // match_from_start: for each pos i in b, length of longest substring b[i..] in a
     // Time: O((|a|+|b|) * log|Σ|)
     // Usage: auto vec = SuffixAutomaton::match_from_start(a,b);
     static vector<int> match_from_start(const string &a, const string &b) {
+        // 1) reverse both
         string ra = a; reverse(ra.begin(), ra.end());
         string rb = b; reverse(rb.begin(), rb.end());
+        // 2) build & prepare SAM on reversed-a
         SuffixAutomaton revSA(ra.size());
-        for (int i = 0; i < (int)ra.size(); ++i) revSA.extend(ra[i], i);
+        for (int i = 0; i < (int)ra.size(); ++i)
+            revSA.extend(ra[i], i);
         revSA.prepare();
+        // 3) run the ordinary match_lengths on reversed-b
         auto rev_ans = revSA.match_lengths(rb);
+        // 4) flip it back so that ans[i] corresponds to b[i]
         int m = b.size();
         vector<int> ans(m);
-        for (int i = 0; i < m; ++i) ans[i] = rev_ans[m - 1 - i];
+        for (int i = 0; i < m; ++i)
+            ans[i] = rev_ans[m - 1 - i];
         return ans;
     }
-
     // distinct_and_total: returns {distinct_count, sum_of_lengths}
     // Time: O(n)
     // Usage: auto [dc,tl] = sa.distinct_and_total();
@@ -263,8 +255,6 @@ struct SuffixAutomaton {
         return {count, total};
     }
 };
-
-// Sparse Table for Range Queries
 template<typename T, class CMP = function<T(const T &, const T &)>>
 class SparseTable {
 public:
@@ -272,8 +262,6 @@ public:
     vector<vector<T>> sp;
     CMP func;
 
-    // Constructor: builds table in O(n log n)
-    // Usage: SparseTable st(vec, [](T a,T b){return min(a,b);});
     SparseTable(const vector<T> &a, const CMP &f) : func(f) {
         n = a.size();
         int max_log = 32 - __builtin_clz(n);
@@ -282,46 +270,54 @@ public:
         for (int j = 1; j < max_log; ++j) {
             sp[j].resize(n - (1 << j) + 1);
             for (int i = 0; i + (1 << j) <= n; ++i) {
-                sp[j][i] = func(sp[j-1][i], sp[j-1][i + (1 << (j-1))]);
+                sp[j][i] = func(
+                        sp[j - 1][i],
+                        sp[j - 1][i + (1 << (j - 1))]
+                );
             }
         }
     }
 
-    // query: answers range [l..r] in O(1)
-    // Usage: T v = st.query(l,r);
     T query(int l, int r) const {
         int lg = __lg(r - l + 1);
-        return func(sp[lg][l], sp[lg][r - (1 << lg) + 1]);
+        return func(
+                sp[lg][l],
+                sp[lg][r - (1 << lg) + 1]
+        );
     }
 };
-
-int main() {
+signed main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
     int t; cin >> t;
-    while (t--) {
-        int n,m,q; cin >> n >> m >> q;
-        string a,b; cin >> a >> b;
+    while(t--) {
+        int n, m, q; cin >> n >>m >> q;
+        string a, b;
+        cin >> a >> b;
+
         SuffixAutomaton sa(a.size());
-        for (int i = 0; i < (int)a.size(); ++i) sa.extend(a[i], i);
+        for (int i = 0; i < (int) a.size(); ++i)
+            sa.extend(a[i], i);
         sa.prepare();
 
-        auto ans = SuffixAutomaton::match_from_start(a,b);
-        SparseTable<int> sp(ans, [](int x,int y){ return min(x,y); });
-        while (q--) {
+        auto ans = sa.match_from_start(a, b);
+        SparseTable sp(ans, [](int a, int b){return min(a, b);});
+        while(q--){
             int l,r; cin >> l >> r;
-            l--; r--;
-            int L = 1, R = r-l+1, best=0;
-            while (L <= R) {
-                int mid = (L+R)/2;
-                if (sp.query(l, r-mid+1) >= mid) {
-                    best = mid;
-                    L = mid+1;
-                } else R = mid-1;
+            l--,r--;
+            int L = 1, R = r - l + 1 , final = 0;
+            while(L <= R){
+                int mid = (L + R) / 2;
+                if(sp.query(l, r - mid + 1) >= mid){
+                    final = mid;
+                    L = mid + 1;
+                }
+                else R = mid - 1;
             }
-            cout << best << '\n';
+            cout << final << endl;
         }
+
     }
 
     return 0;
