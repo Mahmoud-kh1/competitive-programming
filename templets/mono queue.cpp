@@ -3,7 +3,7 @@ using namespace std;
 #define int long long
 #define ld long double
 const int oo = 2e9;
-
+/// max 
 struct Queue {
     struct Node {
         int mx = -oo, mn = oo, val;
@@ -44,6 +44,58 @@ struct Queue {
     void pop() {
         if(b.empty()) move();
         if(!b.empty()) b.pop();
+    }
+};
+
+/// MIN 
+const int oo = 2e9;
+
+struct MinQueue {
+    struct Node {
+        int mn = oo;
+        int val;
+        Node() : val(0) {}
+        Node(int x) : mn(x), val(x) {}
+    };
+
+    stack<Node> a, b;
+
+    int size() const { return int(a.size() + b.size()); }
+
+    // Merge r into l by taking minimum
+    static void mrg(Node &l, const Node &r) {
+        l.mn = min(l.mn, r.mn);
+    }
+
+    // Push new element at the back
+    void push(int v) {
+        Node nd(v);
+        if (!a.empty()) mrg(nd, a.top());
+        a.push(nd);
+    }
+
+    // Move all elements from a to b (reversing order)
+    void move() {
+        while (!a.empty()) {
+            Node nd(a.top().val);
+            if (!b.empty()) mrg(nd, b.top());
+            b.push(nd);
+            a.pop();
+        }
+    }
+
+    // Pop element from the front
+    void pop() {
+        if (b.empty()) move();
+        if (!b.empty()) b.pop();
+    }
+
+    // Get current minimum
+    int get_min() const {
+        int res = oo;
+        if (!b.empty()) res = min(res, b.top().mn);
+        if (!a.empty()) res = min(res, a.top().mn);
+        return res;
     }
 };
 
