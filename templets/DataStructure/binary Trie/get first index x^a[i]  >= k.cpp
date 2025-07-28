@@ -43,7 +43,7 @@ struct Trie {
         trie[cur].sz++;
         trie[cur].mnIndex = min(trie[cur].mnIndex, trie[trie[cur][bit]].mnIndex);
     }
-
+     // get first index  xo ^ a[i] >= L
     int getAns(int xo, int L) {
         int cur = 0;
         int ans = 1e9;
