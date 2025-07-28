@@ -1,0 +1,72 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define int long long
+ 
+signed main() {
+    ios::sync_with_stdio(0);
+    cin.tie(NULL);
+    int n; cin >> n;
+    vector<int> adj[n + 1];
+    for(int i = 1; i < n; i++){
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+ 
+    vector<int> dp(n + 1, 0), sz(n + 1, 0), ans(n + 1, 0);
+ 
+    function<void(int,int)> solve = [&](int u, int p){
+        sz[u] = 1;
+        dp[u] = 0;
+        for(auto v : adj[u]){
+            if (v == p) continue;
+            solve(v, u);
+            sz[u] += sz[v];
+            dp[u] += dp[v] + sz[v];
+        }
+    };
+    solve(1, 0);
+ 
+    function<void(int,int)> solve1 = [&](int u, int p){
+        ans[u] = dp[u];
+ 
+        vector<int> ch;
+        for(int v : adj[u]){
+            ch.push_back(v);
+        }
+        int m = ch.size();
+ 
+        vector<int> pre(m+1, 0), suf(m+2, 0);
+        for(int i = 0; i < m; i++){
+            int v = ch[i];
+            pre[i+1] = pre[i] + dp[v] + sz[v];
+        }
+        for(int i = m-1; i >= 0; i--){
+            int v = ch[i];
+            suf[i+1] = suf[i+2] + dp[v] + sz[v];
+        }
+ 
+        for(int i = 0; i < m; i++){
+            int v = ch[i];
+            if (v == p) continue;
+            int orig_dp_u = dp[u];
+            dp[u] = pre[i] + suf[i+2];
+            dp[v] += dp[u] + (n - sz[v]);
+            int orgszu = sz[u];
+            int orgszv = sz[v];
+            sz[u] = (n - sz[v]);
+            sz[v] = n;
+            solve1(v, u);
+            dp[u] = orig_dp_u;
+            sz[v] = orgszv;
+            sz[u] = orgszu;
+        }
+    };
+ 
+    solve1(1, 0);
+ 
+    for(int i = 1; i <= n; i++) {
+        cout << ans[i] << (i == n ? '\n' : ' ');
+    }
+    return 0;
+}
