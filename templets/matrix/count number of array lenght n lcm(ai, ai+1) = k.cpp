@@ -68,7 +68,10 @@ signed main() {
     while(t--){
         int n, k; cin >> n >> k;
         vector<pair<int,int>>fac = factor(k);
-        int ans = 1;
+        int ans = 1; 
+        // we solve for each prime how many ways we can make that every two adj the max of power is the in lcm 
+        // if we solve it dp it will be like dp[idx][bool of last if we put it as max or not] 
+        // dp[i][1] = dp[i - 1][0] + dp[i - 1][1] , dp[i][0] = dp[i - 1][1] * power of that prime we solve for 
         for(auto [p, e] : fac){
             Matrix<int>T(2, 2);
             T[0][1] = 1;
