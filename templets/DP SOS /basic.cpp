@@ -30,6 +30,7 @@ signed main(){
         }
         // dp[j] how many submasks of j in the array it means j | a[i] = j 
         // dp2[j] how many supermasks to j in the array it means j & a[i] = j
+        // last one is how many x & y != 0 where x  = a[i]
         
         for(int i = 0; i < n; i++) cout << dp[a[i]] << " " << dp2[a[i]] << " " << n - dp[a[i] ^ ((1 << N) - 1)] << endl;
 
