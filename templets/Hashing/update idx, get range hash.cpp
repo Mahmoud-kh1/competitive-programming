@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define int long long
-const int M = 3, N = 1e6 + 7;
+const int M = 1, N = 1e6 + 7;
 // be carful with date types
 int bases[M], mods[M], powers[M][N], pre[M][N];
 void build(int maxValue){
