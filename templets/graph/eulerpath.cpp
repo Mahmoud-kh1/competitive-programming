@@ -75,3 +75,132 @@ signed main() {
     cin >> t;
     while (t--) magic();
 }
+
+
+
+from chat, 
+#include <bits/stdc++.h>
+using namespace std;
+
+// Undirected Eulerian Path/Circuit
+//   If exactly 0 odd‐degree vertices → returns circuit
+//   If exactly 2 odd‐degree vertices → returns path from odd1→odd2
+//   Otherwise returns empty vector (no Eulerian trail)
+// Graph is 0…N-1
+
+vector<int> euler_path_undirected(int N, vector<vector<pair<int,int>>>& adj) {
+    vector<int> deg(N);
+    for(int u=0;u<N;u++)
+        for(auto [v, eid]: adj[u])
+            deg[u]++;
+
+    int start = -1, odd = 0;
+    for(int i=0;i<N;i++){
+        if(deg[i]%2){
+            odd++;
+            if(start<0) start = i;
+        }
+    }
+    if(odd!=0 && odd!=2) return {};    
+    if(start<0) start = 0;  // all even: can start anywhere
+
+    vector<bool> used_edge(adj.size(), false);
+    vector<int> stk, path;
+    stk.push_back(start);
+
+    // iterative Hierholzer
+    while(!stk.empty()){
+        int u = stk.back();
+        while(!adj[u].empty() && used_edge[adj[u].back().second]) {
+            adj[u].pop_back();
+        }
+        if(adj[u].empty()){
+            path.push_back(u);
+            stk.pop_back();
+        } else {
+            auto [v,eid] = adj[u].back();
+            used_edge[eid] = true;
+            stk.push_back(v);
+        }
+    }
+    // path.size()==#edges+1?
+    return path;  
+}
+
+// Directed Eulerian Path/Circuit
+//   If in==out for all→circuit
+//   If one vertex has out=in+1 (start) and one has in=out+1 (end), all others in==out→path
+//   Otherwise empty
+vector<int> euler_path_directed(int N, vector<vector<pair<int,int>>>& adj) {
+    vector<int> indeg(N), outdeg(N);
+    for(int u=0;u<N;u++){
+        for(auto [v,eid]: adj[u]){
+            outdeg[u]++;
+            indeg[v]++;
+        }
+    }
+    int start = -1, end = -1;
+    for(int i=0;i<N;i++){
+        if(outdeg[i] - indeg[i] == 1){
+            if(start<0) start = i;
+            else return {};
+        } else if(indeg[i] - outdeg[i] == 1){
+            if(end<0) end = i;
+            else return {};
+        } else if(indeg[i]!=outdeg[i]){
+            return {};
+        }
+    }
+    if(start<0) {
+        // circuit case: pick any vertex with edges
+        for(int i=0;i<N;i++) if(outdeg[i]>0){ start = i; break; }
+        if(start<0) return {};  // no edges at all
+    }
+
+    vector<bool> used_edge(adj.size(), false);
+    vector<int> stk, path;
+    stk.push_back(start);
+
+    while(!stk.empty()){
+        int u = stk.back();
+        while(!adj[u].empty() && used_edge[adj[u].back().second]) {
+            adj[u].pop_back();
+        }
+        if(adj[u].empty()){
+            path.push_back(u);
+            stk.pop_back();
+        } else {
+            auto [v,eid] = adj[u].back();
+            used_edge[eid] = true;
+            stk.push_back(v);
+        }
+    }
+    return path;
+}
+
+
+int main(){
+    int N, M;
+    cin >> N >> M;
+    // build undirected:
+    vector<vector<pair<int,int>>> adj(N);
+    for(int i=0;i<M;i++){
+        int u,v;
+        cin >> u >> v;
+        // zero‐based
+        adj[u].emplace_back(v,i);
+        adj[v].emplace_back(u,i);
+    }
+    auto path = euler_path_undirected(N, adj);
+    if(path.empty()){
+        cout << "NO EULERIAN TRAIL\n";
+    } else {
+        // path is reversed order end→start
+        reverse(path.begin(), path.end());
+        for(int x: path) cout<<x<<" ";
+        cout<<"\n";
+    }
+    return 0;
+}
+
+
