@@ -1,115 +1,101 @@
-#include <iostream>
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
-#include <bits/stdc++.h>
-using namespace std;
-using ll = long long;
 
-struct WaveletTree {
+const int MAXN = (int)3e5 + 9;
+const int MAXV = (int)1e9 + 9; //maximum value of any element in array
+
+// one indexed array
+//array values can be negative too, use appropriate minimum and maximum value
+struct wavelet_tree {
     int lo, hi;
-    WaveletTree *lC, *rC;
-    vector<int> b;      // b[i] = # of elements among first i that go left
-    vector<ll> csum;    // csum[i] = sum of first i elements
+    wavelet_tree *l, *r;
+    int *b, *c, bsz, csz; // c holds the prefix sum of elements
 
-    // build on [from,to) with values in [x..y]
-    WaveletTree(int *from, int *to, int x, int y)
-            : lo(x), hi(y), lC(nullptr), rC(nullptr),
-              b(1,0), csum(1,0)
-    {
-        if (from >= to || lo == hi) return;
+    wavelet_tree() {
+        lo = 1;
+        hi = 0;
+        bsz = 0;
+        csz = 0, l = NULL;
+        r = NULL;
+    }
+
+    void init(int *from, int *to, int x, int y) {
+        lo = x, hi = y;
+        if(from >= to) return;
         int mid = (lo + hi) >> 1;
-        for (auto it = from; it != to; ++it) {
-            b.push_back(b.back() + ((*it) <= mid));
-            csum.push_back(csum.back() + *it);
+        auto f = [mid](int x) {
+            return x <= mid;
+        };
+        b = (int*)malloc((to - from + 2) * sizeof(int));
+        bsz = 0;
+        b[bsz++] = 0;
+        c = (int*)malloc((to - from + 2) * sizeof(int));
+        csz = 0;
+        c[csz++] = 0;
+        for(auto it = from; it != to; it++) {
+            b[bsz] = (b[bsz - 1] + f(*it));
+            c[csz] = (c[csz - 1] + (*it));
+            bsz++;
+            csz++;
         }
-        auto pivot = stable_partition(from, to,
-                                      [&](int v){ return v <= mid; });
-        lC = new WaveletTree(from, pivot, lo, mid);
-        rC = new WaveletTree(pivot, to, mid+1, hi);
+        if(hi == lo) return;
+        auto pivot = stable_partition(from, to, f);
+        l = new wavelet_tree();
+        l->init(from, pivot, lo, mid);
+        r = new wavelet_tree();
+        r->init(pivot, to, mid + 1, hi);
     }
-
-    // internally convert 0‑based [l..r] to 1‑based [l1..r1]
-    inline pair<int,int> lr1(int l, int r) {
-        return {l+1, r+1};
+    //kth smallest element in [l, r]
+    //for array [1,2,1,3,5] 2nd smallest is 1 and 3rd smallest is 2
+    int kth(int l, int r, int k) {
+        if(l > r) return 0;
+        if(lo == hi) return lo;
+        int inLeft = b[r] - b[l - 1], lb = b[l - 1], rb = b[r];
+        if(k <= inLeft) return this->l->kth(lb + 1, rb, k);
+        return this->r->kth(l - lb, r - rb, k - inLeft);
     }
-
-    // kth smallest in A[l..r] (0‑based)
-    int kthSmall(int l, int r, int k) {
-        auto [l1, r1] = lr1(l, r);
-        if (l1 > r1) return 0;
-        if (lo == hi) return lo;
-        int inLeftL = b[l1-1], inLeftR = b[r1];
-        int cntLeft = inLeftR - inLeftL;
-        if (k <= cntLeft)
-            return lC->kthSmall(inLeftL, inLeftR-1, k);
-        else {
-            int skipL = (l1-1) - inLeftL;
-            int skipR =  r1    - inLeftR - 1;
-            return rC->kthSmall(skipL, skipR, k - cntLeft);
-        }
+    //count of numbers in [l, r] Less than or equal to k
+    int LTE(int l, int r, int k) {
+        if(l > r || k < lo) return 0;
+        if(hi <= k) return r - l + 1;
+        int lb = b[l - 1], rb = b[r];
+        return this->l->LTE(lb + 1, rb, k) + this->r->LTE(l - lb, r - rb, k);
     }
-
-    // kth largest = (len-k+1)th smallest
-    int kthLarge(int l, int r, int k) {
-        int len = r - l + 1;
-        return kthSmall(l, r, len - k + 1);
+    //count of numbers in [l, r] equal to k
+    int count(int l, int r, int k) {
+        if(l > r || k < lo || k > hi) return 0;
+        if(lo == hi) return r - l + 1;
+        int lb = b[l - 1], rb = b[r];
+        int mid = (lo + hi) >> 1;
+        if(k <= mid) return this->l->count(lb + 1, rb, k);
+        return this->r->count(l - lb, r - rb, k);
     }
-
-    // count ≤ x in A[l..r]
-    int LTE(int l, int r, int x) {
-        auto [l1,r1] = lr1(l, r);
-        if (l1 > r1 || x < lo) return 0;
-        if (hi <= x) return r1 - l1 + 1;
-        int inLeftL = b[l1-1], inLeftR = b[r1];
-        return lC->LTE(inLeftL, inLeftR-1, x)
-               + rC->LTE(l1-1-inLeftL, r1-inLeftR-1, x);
+    //sum of numbers in [l ,r] less than or equal to k
+    int sum(int l, int r, int k) {
+        if(l > r or k < lo) return 0;
+        if(hi <= k) return c[r] - c[l - 1];
+        int lb = b[l - 1], rb = b[r];
+        return this->l->sum(lb + 1, rb, k) + this->r->sum(l - lb, r - rb, k);
     }
-
-    // count ≥ x
-    int GTE(int l, int r, int x) {
-        return (r-l+1) - LTE(l, r, x-1);
-    }
-
-    // count == x
-    int EQ(int l, int r, int x) {
-        return LTE(l, r, x) - LTE(l, r, x-1);
-    }
-
-    // sum of ≤ x in A[l..r]
-    ll sumLTE(int l, int r, int x) {
-        auto [l1,r1] = lr1(l, r);
-        if (l1 > r1 || x < lo) return 0;
-        if (hi <= x)
-            return csum[r1] - csum[l1-1];
-        int inLeftL = b[l1-1], inLeftR = b[r1];
-        ll leftSum  = lC->sumLTE(inLeftL, inLeftR-1, x);
-        ll rightSum = rC->sumLTE(l1-1-inLeftL, r1-inLeftR-1, x);
-        return leftSum + rightSum;
-    }
-
-    // sum of ≥ x
-    ll sumGTE(int l, int r, int x) {
-        auto [l1,r1] = lr1(l, r);
-        ll total = csum[r1] - csum[l1-1];
-        return total - sumLTE(l, r, x-1);
+    ~wavelet_tree() {
+        delete l;
+        delete r;
     }
 };
-
+wavelet_tree t;
+int a[MAXN];
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    int n, q; cin >> n >> q;
-    vector<int>a(n);
-    for(int i = 0; i < n; i ++) cin >> a[i];
-    int mn = *min_element(a.begin(), a.end());
-    int mx = *max_element(a.begin(), a.end());
-    WaveletTree wt(&a[0], &a[0]+n, mn, mx);
-    while(q--){
-        int l,r; cin >> l >> r;
-        int k; cin >> k;
-        l--,r--;
-        cout << wt.kthSmall(l, r, k) << endl;
-    }
+    int i, j, k, n, m, q, l, r;
+    cin >> n >> q;
+    for(i = 1; i <= n; i++) cin >> a[i];
+    t.init(a + 1, a + n + 1, -MAXV, MAXV);
+    //beware! after the init() operation array a[] will not be same
 
+    while(q--) {
+        cin >> l >> r >> k;
+            //kth smallest
+            cout << t.kth(l, r, k) << endl;
+
+    }
     return 0;
 }
