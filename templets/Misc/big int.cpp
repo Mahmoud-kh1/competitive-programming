@@ -1,30 +1,56 @@
-__int128 read() {
-    __int128 x = 0, f = 1;
-    char ch = getchar();
-    while (ch < '0' || ch > '9') {
-        if (ch == '-') f = -1;
-        ch = getchar();
-    }
-    while (ch >= '0' && ch <= '9') {
-        x = x * 10 + ch - '0';
-        ch = getchar();
-    }
-    return x * f;
-}
-void print(__int128 x) {
-    if (x < 0) {
-        putchar('-');
-        x = -x;
-    }
-    if (x > 9) print(x / 10);
-    putchar(x % 10 + '0');
-}
-bool cmp(__int128 x, __int128 y) { return x > y; }
+#include <bits/stdc++.h>
 
+using namespace std;
 
-int main(){
-__int128 a;
-a = read(); to read a
-print(a) to print a 
-use endl not '\n' with big int
+#define int long long
+
+ostream &operator<<(ostream &os, const __int128 & value){
+    char buffer[64];
+    char *pos = end(buffer) - 1;
+    *pos = '\0';
+    __int128 tmp = value < 0 ? -value : value;
+    do{
+        --pos;
+        *pos = tmp % 10 + '0';
+        tmp /= 10;
+    }while(tmp != 0);
+    if(value < 0){
+        --pos;
+        *pos = '-';
+    }
+    return os << pos;
+}
+istream &operator>>(istream &is, __int128 &value) {
+    string s;
+    is >> s;
+
+    value = 0;
+    int sign = 1;
+    int i = 0;
+
+    if (s[0] == '-') {
+        sign = -1;
+        i = 1;
+    }
+
+    for (; i < (int)s.size(); i++) {
+        value = value * 10 + (s[i] - '0');
+    }
+
+    value *= sign;
+    return is;
+}
+signed main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int t = 1;
+    // cin >> t;
+    while (t--) {
+       
+       // use cin, cout  as it's 
+        
+    }
+    
+
+    return 0;
 }
