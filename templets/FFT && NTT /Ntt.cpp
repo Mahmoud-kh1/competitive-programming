@@ -1,14 +1,9 @@
-
 #include <bits/stdc++.h>
 using namespace std;
 #define int long long
 #define ll long long
-const ll mod = (119 << 23) + 1, root = 62; // = 998244353
-// For p < 2^30 there is also e.g. 5 << 25, 7 << 26, 479 << 21
-// and 483 << 21 (same root). The last two are > 10^9.
 
-
-ll modpow(ll b, ll e) {
+ll modpow(ll b, ll e, int mod) {
     ll ans = 1;
     for (; e; b = b * b % mod, e /= 2)
         if (e & 1) ans = ans * b % mod;
@@ -16,40 +11,33 @@ ll modpow(ll b, ll e) {
 }
 
 // Primitive Root of the mod of form 2^a * b + 1
-int generator () {
+int generator (int mod) {
     vector<int> fact;
-    int phi = mod-1,  n = phi;
-    for (int i=2; i*i<=n; ++i)
+    int phi = mod - 1, n = phi;
+    for (int i = 2; i * i <= n; ++i)
         if (n % i == 0) {
-            fact.push_back (i);
+            fact.push_back(i);
             while (n % i == 0)
                 n /= i;
         }
-    if (n > 1)
-        fact.push_back (n);
+    if (n > 1) fact.push_back(n);
 
-    for (int res=2; res<=mod; ++res) {
+    for (int res = 2; res <= mod; ++res) {
         bool ok = true;
-        for (size_t i=0; i<fact.size() && ok; ++i)
-            ok &= modpow (res, phi / fact[i]) != 1;
-        if (ok)  return res;
+        for (size_t i = 0; i < fact.size() && ok; ++i)
+            ok &= modpow(res, phi / fact[i], mod) != 1;
+        if (ok) return res;
     }
     return -1;
 }
-int modpow(int b, int e, int m) {
-    int ans = 1;
-    for (; e; b = (ll)b * b % m, e /= 2)
-        if (e & 1) ans = (ll)ans * b % m;
-    return ans;
-}
 
-void ntt(vector<int> &a) {
+void ntt(vector<int> &a, int mod, int root) {
     int n = (int)a.size(), L = 31 - __builtin_clz(n);
-    vector<int> rt(2, 1); // erase the static if you want to use two moduli;
-    for (int k = 2, s = 2; k < n; k *= 2, s++) { // erase the static if you want to use two moduli;
+    vector<int> rt(2, 1);
+    for (int k = 2, s = 2; k < n; k *= 2, s++) {
         rt.resize(n);
         int z[] = {1, modpow(root, mod >> s, mod)};
-        for (int i = k; i < 2*k; ++i) rt[i] = (ll)rt[i / 2] * z[i & 1] % mod;
+        for (int i = k; i < 2 * k; ++i) rt[i] = (ll)rt[i / 2] * z[i & 1] % mod;
     }
     vector<int> rev(n);
     for (int i = 0; i < n; ++i) rev[i] = (rev[i / 2] | (i & 1) << L) / 2;
@@ -64,18 +52,18 @@ void ntt(vector<int> &a) {
         }
     }
 }
-vector<int> conv(const vector<int> &a, const vector<int> &b) {
+
+vector<int> conv(const vector<int> &a, const vector<int> &b, int mod, int root) {
     if (a.empty() || b.empty()) return {};
     int s = (int)a.size() + (int)b.size() - 1, B = 32 - __builtin_clz(s), n = 1 << B;
-    int inv = modpow(n, mod - 2, mod);
+    int invn = modpow(n, mod - 2, mod);
     vector<int> L(a), R(b), out(n);
     L.resize(n), R.resize(n);
-    ntt(L), ntt(R);
-    for (int i = 0; i < n; ++i) out[-i & (n - 1)] = (ll)L[i] * R[i] % mod * inv % mod;
-    ntt(out);
+    ntt(L, mod, root), ntt(R, mod, root);
+    for (int i = 0; i < n; ++i) out[-i & (n - 1)] = (ll)L[i] * R[i] % mod * invn % mod;
+    ntt(out, mod, root);
     return {out.begin(), out.begin() + s};
 }
-
 ll CRT(ll a, ll m1, ll b, ll m2) {
     __int128 m = m1*m2;
     ll ans = a*m2%m*modpow(m2, m1-2, m1)%m + m1*b%m*modpow(m1, m2-2, m2)%m;
@@ -83,9 +71,8 @@ ll CRT(ll a, ll m1, ll b, ll m2) {
 }
 
 
-/*
-
-int mod, root, desired_mod = 1000000007;
+int mod = 998244353, root = generator(mod);
+int desired_mod = 1000000007;
 const int mod1 = 167772161;
 const int mod2 = 469762049;
 const int mod3 = 754974721;
@@ -110,20 +97,10 @@ int CRT(int a, int b, int c, int m1, int m2, int m3) {
     return (ans % M) % desired_mod;
 }
 
-*/
 signed main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int t = 1;
-//cin >> t;
-    while(t--) {
 
-         // first you sholud check if mod - 1 is 2^power >= length of the biggest array 
-         // if not we solve the for three mods 
-         // we seat the mod = mod1 , root = root1 get res1 , and same for 2 ,, and same for 3
-         // final = CRT(res1[i], mod1, res2[i], mod2,....)
-
-    }
-
+     calc for mod1 , mod2, mod3 
+    and then final[i] = CRT(res1[i], res2[i], res3[i], mod1, mod2, mod3)
 }
-
