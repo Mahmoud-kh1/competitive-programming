@@ -1,17 +1,17 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define int long long
+#define  int long long 
 struct SuffixArray {
     // suff is the suffix array with the empty suffix being suff[0]
     // lcp[i] holds the lcp between sa[i], sa[i - 1]
     // pos is rank of index i in suffix
     int n;
     vector<int> suff, lcp, pos, lg;
-    
+
     // change 21 to log (n)
     vector<array<int, 21>> table;
-    
+
     SuffixArray(string &s, int lim = 256) {
         n = s.size() + 1;
         int k = 0, a, b;
@@ -38,7 +38,7 @@ struct SuffixArray {
         k++) {}
         preLcp();
     }
- 
+
     void preLcp() {
         lg.resize(n + 5);
         table.resize(n + 5);
@@ -48,8 +48,7 @@ struct SuffixArray {
             for (int i = 0; i <= n - (1 << j); ++i)
                 table[i][j] = min(table[i][j - 1], table[i + (1 << (j - 1))][j - 1]);
     }
- 
-    // pass the pos of the suffixes
+
     int queryLcp(int i, int j) {
         if (i == j) return n - suff[i] - 1;
         if (i > j) swap(i, j);
@@ -57,8 +56,8 @@ struct SuffixArray {
         int len = lg[j - i + 1];
         return min(table[i][len], table[j - (1 << len) + 1][len]);
     }
-    
-    // freq[k] is how many distinct substring that occ exactly k times
+// how many dist substring occured exactly K stored insid freq[k]
+
     vector<int>getExactOcc(int sz) {
         vector<int>st, freq(sz + 5, 0);
         for (int i = 1; i <= sz + 1; i++) {
@@ -76,25 +75,82 @@ struct SuffixArray {
         return freq;
     }
 };
+pair<int,int> merge (pair<int,int> g, pair<int,int> b){
+    return {max(g.first, b.first), min(g.second, b.second)};
+}
+vector<vector<pair<int,int>>>sp;
+void build (const vector<int>& a){
+    int sz = a.size();
+    sp = vector<vector<pair<int,int>>>(__lg(sz) + 5, vector<pair<int,int>>(sz));
+    for (int i = 0; i <sz; i++) sp[0][i] = {a[i], a[i]};
+    for (int i = 1; i < sp.size(); i++){
+        for (int j = 0; j + (1 << i) - 1 < sz; j++){
+            sp[i][j] = merge(sp[i - 1][j] , sp[i - 1][j + (1 << (i - 1))]);
+        }
+    }
+}
 
+pair<int,int>  query_for_overlaped(int l, int r){
+    int maxL = __lg(r - l + 1);
+    pair<int,int> res  = sp[maxL][l];
+    res = merge(res, sp[maxL][r - (1 << maxL) + 1]);
+    return res;
+}
+struct dsu {
+    vector<int>sz, par;
+    vector<vector<int>>comp;
+    vector<pair<int,int>>info;
+    void init(int n, vector<int>&ind) {
+        sz.resize(n + 1);
+        par.resize(n + 1); comp.resize(n + 1);
+        info.resize(n + 1);
+        for (int i = 0; i <= n; i++) sz[i] = 1, par[i] = i, comp[i].push_back(ind[i]), info[i] = {ind[i] , ind[i]};
+    }
+    int find(int u) {
+        return (u == par[u] ? u : par[u] = find(par[u]));
+    }
+};
 signed main() {
 
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     string s; cin >> s;
     int n = s.size();
-    SuffixArray sa(s); 
-    
-    
-    vector<int>freq = sa.getExactOcc(n);
-    int ans = n * (n + 1) / 2;
-    for (int k = 1; k <= n; k++) {
-        ans += freq[k] * k * (k - 1) / 2;
+    SuffixArray sa(s);
+    auto &lcp = sa.lcp;
+    vector<pair<int,int>>edges;
+    auto &ind = sa.suff;
+    for (int i = 1; i < lcp.size(); i++) {
+        edges.push_back({lcp[i], i});
     }
-    cout << ans;
     
+    n = lcp.size(); 
     
+    sort(edges.rbegin(), edges.rend());
+    dsu dsu; dsu.init(n + 1, ind);
+    int ans = s.size();
+    for (auto [w, u] : edges) {
+        int v = u - 1;
+        u = dsu.find(u);
+        v = dsu.find(v);
+        if (u == v) continue;
+        if (dsu.sz[v] > dsu.sz[u]) swap(u ,v);
+        
+        for (auto j : dsu.comp[v]) {
+            ans = max(ans, abs(dsu.info[u].first - j) + w + w * w);
+            ans = max(ans, abs(dsu.info[u].second - j) + w + w * w);
+            dsu.info[u] = {min(dsu.info[u].first, j), max(dsu.info[u].second, j)};
+            dsu.comp[u].push_back(j);
+        }
+        dsu.par[v] = u; dsu.sz[u] += dsu.sz[v];
+        
+    }
+    cout << ans << endl;
     
+
+
+
+
 
     return 0;
 }
