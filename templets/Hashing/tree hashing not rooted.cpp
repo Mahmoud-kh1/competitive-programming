@@ -1,0 +1,130 @@
+#include <bits/stdc++.h>
+using namespace std;
+ 
+struct TreeHasher {
+    using ll = long long;
+ 
+private:
+    static inline ll split(ll x) {
+        x += 0x9e3779b974a7c15ULL;
+        x = (x ^ (x >> 30)) * 0xbf58476d1e4e5b9LL;
+        x = (x ^ (x >> 27)) * 0x94d049bb33111ebLL;
+        return x ^ (x >> 31);
+    }
+ 
+    static ll combine(const vector<ll>& child) {
+        ll h = 146959810393466537LL;
+        for (ll x : child) {
+            ll k = x + 0x9e3779b97f4a7c15ULL;
+            h ^= k + (h << 6) + (h >> 2);
+            h *= 1099511628211ULL;
+        }
+        h ^= (0xff51afd7ed558cLL ^ (ll)child.size());
+        return split(h);
+    }
+ 
+public:
+    // Finds 1 or 2 centers of an unrooted tree
+    static vector<int> find_centers(int n, const vector<vector<int>>& adj) {
+        if (n == 1) return {1};
+        vector<int> deg(n + 1);
+        queue<int> q;
+        for (int i = 1; i <= n; ++i) {
+            deg[i] = (int)adj[i].size();
+            if (deg[i] <= 1) q.push(i);
+        }
+        int removed = 0;
+        while (!q.empty()) {
+            if (n - removed <= 2) {
+                vector<int> centers;
+                while (!q.empty()) { centers.push_back(q.front()); q.pop(); }
+                return centers;
+            }
+            int sz = q.size();
+            removed += sz;
+            for (int i = 0; i < sz; ++i) {
+                int u = q.front(); q.pop();
+                for (int v : adj[u]) {
+                    if (--deg[v] == 1) q.push(v);
+                }
+            }
+        }
+        return {};
+    }
+ 
+    // Computes the hash for a tree rooted at 'root'
+    static ll rooted_hash(int root, const vector<vector<int>>& adj) {
+        int n = (int)adj.size() - 1;
+        vector<int> parent(n + 1, -1), order; 
+        order.reserve(n);
+        
+        stack<int> st;
+        st.push(root); 
+        parent[root] = 0;
+        
+        while (!st.empty()) {
+            int u = st.top(); st.pop();
+            order.push_back(u);
+            for (int v : adj[u]) {
+                if (parent[v] == -1) {
+                    parent[v] = u;
+                    st.push(v);
+                }
+            }
+        }
+        
+        vector<ll> h(n + 1, 0);
+        for (int i = (int)order.size() - 1; i >= 0; --i) {
+            int u = order[i];
+            vector<ll> ch; 
+            ch.reserve(adj[u].size());
+            for (int v : adj[u]) {
+                if (v != parent[u]) ch.push_back(h[v]);
+            }
+            sort(ch.begin(), ch.end());
+            h[u] = combine(ch);
+        }
+        return h[root];
+    }
+ 
+    // Computes the canonical hash for an unrooted tree
+    static ll get_hash(const vector<vector<int>>& adj) {
+        int n = (int)adj.size() - 1;
+        if (n <= 0) return 0;
+        if (n == 1) return 1;
+        
+        vector<int> centers = find_centers(n, adj);
+        if (centers.size() == 1) {
+            return rooted_hash(centers[0], adj);
+        }
+        
+        ll h1 = rooted_hash(centers[0], adj);
+        ll h2 = rooted_hash(centers[1], adj);
+        if (h1 > h2) swap(h1, h2);
+        
+        return combine({h1, h2});
+    }
+}; 
+ 
+signed main(){
+    int t;  
+    cin >> t;
+    while(t--) {
+        int n; cin >> n;
+        TreeHasher h1, h2;
+        vector<vector<int>> adj(n + 1), adj2(n + 1);
+        for (int i= 1; i < n; i++) {
+            int u, v; cin >> u >> v;
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+        for (int i = 1; i < n; i++) {
+            int u, v; cin >> u >> v;
+            adj2[u].push_back(v);
+            adj2[v].push_back(u);
+        }
+        int x = h1.get_hash(adj);
+        int y = h2.get_hash(adj2);
+        cout << (x == y ? "YES" : "NO") << endl;
+    }
+}
